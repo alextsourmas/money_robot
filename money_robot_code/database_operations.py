@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
+import yaml
 import snowflake.connector as snow
 from snowflake.connector.pandas_tools import write_pandas  
 from snowflake.connector.pandas_tools import pd_writer
-
 
 
 def get_col_types(df: pd.DataFrame, verbose= True) -> str:
@@ -49,15 +49,26 @@ def create_table(table: str, action: str, col_type: str, df: pd.DataFrame, verbo
         dependencies: function get_col_types(); helper function to get the col and dtypes to create a table
     '''
 
+    with open("config.yaml", "r") as ymlfile:
+        config = yaml.safe_load(ymlfile)
+
+    account = config['snowflake']['account']
+    user = config['snowflake']['user']
+    password = config['snowflake']['password']
+    warehouse = config['snowflake']['warehouse']
+    database = config['snowflake']['database']
+    schema = config['snowflake']['schema']
+    role = config['snowflake']['role']
+
     # set up connection
     conn = snow.connect(
-               account = "DATAROBOT_PARTNER",
-               user = "DATAROBOT",
-               password = "D@t@robot",
-               warehouse = "DEMO_WH",
-               database = "SANDBOX",
-               schema = "TRAINING",
-               role = "PUBLIC")    
+               account = account,
+               user = user,
+               password = password,
+               warehouse = warehouse,
+               database = database,
+               schema = schema,
+               role = role)    
     # set up cursor
     if verbose: print('\nSetting up Snowflake connection...')
     cur = conn.cursor()

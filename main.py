@@ -1,20 +1,28 @@
 # -*- coding: utf-8 -*-
 
+#Import libraries
+import yaml
+from yaml.loader import Loader
+
 #Import custom libraries
 from money_robot_code import data_engineering
 import money_robot_code.database_operations as database_operations
 
+#Load the config file with settings
+with open("config.yaml", "r") as ymlfile:
+    config = yaml.safe_load(ymlfile)
 
-ticker_list = ['SPY'] #Choose a ticker
-strategy_list = ['buy', 'sell'] #Options are "buy", "sell", or "both"
-shift_period_list = [3] #How many days are we predicting out? 
-move_value_list = [1.5] #What percent do we want the market to move buy to indicate "buy" or "sell"?
-table_prefix = 'ALEXT'
+#Load data settings from config file
+ticker_list = config['data']['ticker_list']
+shift_period_list = config['data']['shift_period_list']
+move_value_list = config['data']['move_value_list']
+strategy_list = config['data']['strategy_list']
+table_prefix = config['data']['table_prefix']
 
-pull_data_into_memory = True #Get data for training or testing? Doing things locally? 
-save_data_locally = True 
-load_data_into_snowflake = True #Load the data from memory into snowflake? 
-
+#Load app settings from config file
+pull_data_into_memory = config['app']['pull_data_into_memory']
+save_data_locally = config['app']['save_data_locally']
+load_data_into_snowflake = config['app']['load_data_into_snowflake']
 
 #Define place to store name of dataframes, and dataframes themselves
 all_dataframe_names_list = []
@@ -97,7 +105,7 @@ Immediate Tasks:
         - Model
     - Set up the code to use the config files AND argparse, depending on what you want
     - (DONE) Save the code in Github 
-        - Add a readme and instructions to the Github 
+        - Add a readme and instructions to the Github (USE PIP FOR INSTALL, NOT CONDA)
     - Build initial deployments end-to-end in DataRobot
         - Create deployments
         - Set up job definitions (run 1 hour before market closes)
@@ -111,6 +119,7 @@ Things to do Later:
     - Score via the API as well
     - Build a streamlit application which tracks performance
     -   Deploy it on the cloud
+    - Dockerize so that there isn't problems with the requirements file 
     - Deploy Python code on the cloud, add DevOps pipelines from Github
     
 '''
