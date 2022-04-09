@@ -21,7 +21,7 @@ def get_col_types(df: pd.DataFrame, verbose= True) -> str:
     # only considers objects at this point
     # only considers objects and ints at this point
     ct['col'] = np.where(ct['col']=='OBJECT', 'VARCHAR', ct['col'])
-    ct['col'] = np.where(ct['col'].str.contains('DATE'), 'TIMESTAMP_TZ', ct['col'])
+    ct['col'] = np.where(ct['col'].str.contains('DATE'), 'VARCHAR', ct['col'])
     ct['col'] = np.where(ct['col'].str.contains('INT'), 'NUMERIC', ct['col'])
     ct['col'] = np.where(ct['col'].str.contains('FLOAT'), 'FLOAT', ct['col'])
     
