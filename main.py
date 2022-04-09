@@ -13,7 +13,7 @@ table_prefix = 'ALEXT'
 
 pull_data_into_memory = True #Get data for training or testing? Doing things locally? 
 save_data_locally = True 
-load_data_into_snowflake = False #Load the data from memory into snowflake? 
+load_data_into_snowflake = True #Load the data from memory into snowflake? 
 
 
 #Define place to store name of dataframes, and dataframes themselves
