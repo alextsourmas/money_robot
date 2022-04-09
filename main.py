@@ -6,14 +6,14 @@ import money_robot_code.database_operations as database_operations
 
 
 ticker_list = ['SPY'] #Choose a ticker
-strategy_list = ['buy'] #Options are "buy", "sell", or "both"
+strategy_list = ['buy', 'sell'] #Options are "buy", "sell", or "both"
 shift_period_list = [3] #How many days are we predicting out? 
 move_value_list = [1.5] #What percent do we want the market to move buy to indicate "buy" or "sell"?
 table_prefix = 'ALEXT'
 
 pull_data_into_memory = True #Get data for training or testing? Doing things locally? 
 save_data_locally = True 
-load_data_into_snowflake = True #Load the data from memory into snowflake? 
+load_data_into_snowflake = False #Load the data from memory into snowflake? 
 
 
 #Define place to store name of dataframes, and dataframes themselves
@@ -58,6 +58,11 @@ for ticker in ticker_list:
                     stock_dataframe_training = stock_dataframe_training.reset_index(drop=True)
                     stock_dataframe_testing = stock_dataframe.head(1)
 
+                    #Load training and testing dataframes into the dictionary, with names
+                    all_dataframes_dict[stock_dataframe_training_table_string] = stock_dataframe_training
+                    all_dataframes_dict[stock_dataframe_testing_table_string] = stock_dataframe_testing
+
+
                 if load_data_into_snowflake == True: 
                     #Load data into database for TRAINING
                     query_string_train = database_operations.get_col_types(df= stock_dataframe_training)
@@ -68,8 +73,7 @@ for ticker in ticker_list:
                     database_operations.create_table(table= stock_dataframe_testing_table_string,\
                         action= 'create_replace', col_type = query_string_test, df= stock_dataframe_testing)
 
-                    all_dataframes_dict[stock_dataframe_training_table_string] = stock_dataframe_training
-                    all_dataframes_dict[stock_dataframe_testing_table_string] = stock_dataframe_testing
+
 
 #Save data locally
 if save_data_locally == True: 
@@ -81,18 +85,18 @@ if save_data_locally == True:
 '''
 TO DO: 
 Immediate Tasks:
-    - Create conda requirements file (DONE)
-    - Add loops (DONE)
-        - Loop through every setting (DONE)
-        - if pull_data_into_memory == True (DONE)
-            - Save all the related dataframes in a big dictionary, with the dataframes named or labeled for later use (DONE)
-        - Optionally save all of those files locally (DONE)
+    - (DONE)Create conda requirements file 
+    - (DONE) Add loops 
+        - (DONE) Loop through every setting 
+        - (DONE) if pull_data_into_memory == True 
+            - (DONE) Save all the related dataframes in a big dictionary, with the dataframes named or labeled for later use (DONE)
+        - (DONE) Optionally save all of those files locally 
     - Add config files
         - Database
         - DataRobot
         - Model
     - Set up the code to use the config files AND argparse, depending on what you want
-    - Save the code in Github
+    - (DONE) Save the code in Github 
         - Add a readme and instructions to the Github 
     - Build initial deployments end-to-end in DataRobot
         - Create deployments
