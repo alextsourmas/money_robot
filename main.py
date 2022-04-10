@@ -90,6 +90,9 @@ if save_data_locally == True:
         selected_dataframe.to_csv('data/' + dataframe_name + '.csv')
 
 
+
+
+
 '''
 TO DO: 
 Immediate Tasks:
@@ -99,11 +102,11 @@ Immediate Tasks:
         - (DONE) if pull_data_into_memory == True 
             - (DONE) Save all the related dataframes in a big dictionary, with the dataframes named or labeled for later use (DONE)
         - (DONE) Optionally save all of those files locally 
-    - Add config files
-        - Database
+    - Add config files (DONE)
+        - Database (DONE)
         - DataRobot
-        - Model
-    - Set up the code to use the config files AND argparse, depending on what you want
+        - Appp (DONE)
+    - (NOT NECESSARY) Set up the code to use the config files AND argparse, depending on what you want
     - (DONE) Save the code in Github 
         - Add a readme and instructions to the Github (USE PIP FOR INSTALL, NOT CONDA)
     - Build initial deployments end-to-end in DataRobot

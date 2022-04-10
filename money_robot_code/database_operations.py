@@ -48,10 +48,9 @@ def create_table(table: str, action: str, col_type: str, df: pd.DataFrame, verbo
             
         dependencies: function get_col_types(); helper function to get the col and dtypes to create a table
     '''
-
+    #Load config settings 
     with open("config.yaml", "r") as ymlfile:
         config = yaml.safe_load(ymlfile)
-
     account = config['snowflake']['account']
     user = config['snowflake']['user']
     password = config['snowflake']['password']
