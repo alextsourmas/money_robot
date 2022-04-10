@@ -12,6 +12,13 @@ import yfinance as yf
 import ta
 
 
+def clean_dataframe_column_names(): 
+    '''
+    TO DO - Clean dataframe column names - a generic function
+    '''
+    return None
+
+
 def pull_yahoo_data(ticker: str, verbose=True) -> pd.DataFrame:
     '''
     Function to get data from yahoo finance initially, and format as a dataframe. Automatically

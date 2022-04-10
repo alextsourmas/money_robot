@@ -3,10 +3,14 @@
 #Import libraries
 import yaml
 from yaml.loader import Loader
+import requests
+import pandas as pd
 
 #Import custom libraries
 from money_robot_code import data_engineering
 import money_robot_code.database_operations as database_operations
+import money_robot_code.datarobot_operations as datarobot_operations
+import datarobot as dr
 
 #Load the config file with settings
 with open("config.yaml", "r") as ymlfile:
@@ -25,10 +29,19 @@ load_data_into_snowflake = config['app']['load_data_into_snowflake']
 model_factory = config['app']['model_factory']
 api_scoring = config['app']['api_scoring']
 
+if model_factory == True: 
+    datarobot_endpoint = config['datarobot_settings']['endpoint']
+    datarobot_token = config['datarobot_settings']['token'] 
+
+    print('\nConnecting to DataRobot...')
+    dr.Client(endpoint=datarobot_endpoint, token=datarobot_token)
+    print('Connection successful.')
+
 
 #Define place to store name of dataframes, and dataframes themselves
 all_dataframe_names_list = []
 all_dataframes_dict = {}
+projects = {} 
 
 #Loop through all settings
 for ticker in ticker_list: 
@@ -80,12 +93,19 @@ for ticker in ticker_list:
                         action= 'create_replace', col_type = query_string_test, df= stock_dataframe_testing)
 
                 #IF model factory is turned on, create projects for each dataset in DataRobot
-                if model_factory: 
-                    None
+                if model_factory == True: 
+                    
+                    #Build a DataRobot project for every single iteration
+                    datarobot_operations.run_datarobot_model_factory(dataframe= stock_dataframe_training,\
+                        project_name_prefix= stock_dataframe_training_table_string, verbose=True)
+
+                                        
 
 #If API scoring is turned on, score one of the testing files on a selected deployment 
 if api_scoring: 
-    None
+
+    #Score on both the existing buy and sell deployments set in the config file
+    buy_response_df, sell_response_df = datarobot_operations.score_buy_and_sell_strategies(all_dataframes_dict=  all_dataframes_dict)
 
 
 #Save data locally
