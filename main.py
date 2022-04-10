@@ -20,9 +20,11 @@ strategy_list = config['data']['strategy_list']
 table_prefix = config['data']['table_prefix']
 
 #Load app settings from config file
-pull_data_into_memory = config['app']['pull_data_into_memory']
 save_data_locally = config['app']['save_data_locally']
 load_data_into_snowflake = config['app']['load_data_into_snowflake']
+model_factory = config['app']['model_factory']
+api_scoring = config['app']['api_scoring']
+
 
 #Define place to store name of dataframes, and dataframes themselves
 all_dataframe_names_list = []
@@ -50,27 +52,23 @@ for ticker in ticker_list:
                     +'SHIFT'+'_'+str(shift_period)+'_'+'MOVE'+'_'+move_value_string+'_'+'TEST'
                 all_dataframe_names_list.append(stock_dataframe_testing_table_string)
 
+                #Get dataframe, engineer technical indicators, basic reshaping 
+                stock_dataframe = data_engineering.pull_yahoo_data(ticker = ticker, verbose=True)
+                stock_dataframe = data_engineering.create_target_feature(stock_dataframe= stock_dataframe, shift_periods= shift_period,\
+                    move_value= move_value, strategy= strategy, verbose=True)
+                stock_dataframe = data_engineering.engineer_technical_indicators(dataframe= stock_dataframe, verbose=True)
+                stock_dataframe = stock_dataframe.rename(columns={'Stock Splits': 'STOCK_SPLITS'})
 
-                #Get data and engineer features 
-                if pull_data_into_memory == True:
+                #Create training and testing dataframes
+                stock_dataframe_training = stock_dataframe.iloc[shift_period:]
+                stock_dataframe_training = stock_dataframe_training.reset_index(drop=True)
+                stock_dataframe_testing = stock_dataframe.head(1)
 
-                    #Get dataframe, engineer technical indicators, basic reshaping 
-                    stock_dataframe = data_engineering.pull_yahoo_data(ticker = ticker, verbose=True)
-                    stock_dataframe = data_engineering.create_target_feature(stock_dataframe= stock_dataframe, shift_periods= shift_period,\
-                        move_value= move_value, strategy= strategy, verbose=True)
-                    stock_dataframe = data_engineering.engineer_technical_indicators(dataframe= stock_dataframe, verbose=True)
-                    stock_dataframe = stock_dataframe.rename(columns={'Stock Splits': 'STOCK_SPLITS'})
+                #Load training and testing dataframes into the dictionary, with names
+                all_dataframes_dict[stock_dataframe_training_table_string] = stock_dataframe_training
+                all_dataframes_dict[stock_dataframe_testing_table_string] = stock_dataframe_testing
 
-                    #Create training and testing dataframes
-                    stock_dataframe_training = stock_dataframe.iloc[shift_period:]
-                    stock_dataframe_training = stock_dataframe_training.reset_index(drop=True)
-                    stock_dataframe_testing = stock_dataframe.head(1)
-
-                    #Load training and testing dataframes into the dictionary, with names
-                    all_dataframes_dict[stock_dataframe_training_table_string] = stock_dataframe_training
-                    all_dataframes_dict[stock_dataframe_testing_table_string] = stock_dataframe_testing
-
-
+                #Load data into snowflake
                 if load_data_into_snowflake == True: 
                     #Load data into database for TRAINING
                     query_string_train = database_operations.get_col_types(df= stock_dataframe_training)
@@ -81,6 +79,13 @@ for ticker in ticker_list:
                     database_operations.create_table(table= stock_dataframe_testing_table_string,\
                         action= 'create_replace', col_type = query_string_test, df= stock_dataframe_testing)
 
+                #IF model factory is turned on, create projects for each dataset in DataRobot
+                if model_factory: 
+                    None
+
+#If API scoring is turned on, score one of the testing files on a selected deployment 
+if api_scoring: 
+    None
 
 
 #Save data locally
