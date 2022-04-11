@@ -17,6 +17,7 @@ def score_buy_and_sell_strategies(all_dataframes_dict: dict):
         sell_response_df: API response df
     dependencies: 
         dependent on the prior functions to get the all_dataframes_dict
+        
     '''
 
     with open("config.yaml", "r") as ymlfile:
