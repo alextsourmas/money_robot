@@ -8,6 +8,16 @@ from yaml.loader import Loader
 
 
 def score_buy_and_sell_strategies(all_dataframes_dict: dict):
+    '''
+    Score via API for just buy and sell strategies
+    args: 
+        all_dataframes_dict: an output from running the loop prior
+    rtypes: 
+        buy_response_df: API response df
+        sell_response_df: API response df
+    dependencies: 
+        dependent on the prior functions to get the all_dataframes_dict
+    '''
 
     with open("config.yaml", "r") as ymlfile:
         config = yaml.safe_load(ymlfile)
